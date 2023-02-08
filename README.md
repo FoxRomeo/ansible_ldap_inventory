@@ -66,7 +66,7 @@ search_ou: "OU=Servers,OU=Windows,DC=domain,DC=local"
 * default: `0`
 
 ### `auth_type`
-> Defines the type of authentication used when connecting to Active Directory (LDAP). When using `simple`, the **`username`** and **`password`** parameters must be set. When using `gssapi`, run **kinit** before running Ansible to get a valid Kerberos ticket.
+> Defines the type of authentication used when connecting to Active Directory (LDAP). When using `simple`, the **`username`** and **`password`** parameters must be set. When using `gssapi`, additional requirement (cyrus-sasl-gssapi) is needed and run **kinit** before running Ansible to get a valid Kerberos ticket.
 
 * allowed values: `simple`, `gssapi`
 * default: `simple`

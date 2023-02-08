@@ -137,7 +137,7 @@ DOCUMENTATION = '''
              description: 
                 - Defines the type of authentication used when connecting to Active Directory (LDAP).
                 - When using C(simple), the I(username) and (password) options must be set. This requires support of LDAPS (SSL)
-                - When using C(gssapi), run C(kinit) before running Ansible to get a valid Kerberos ticket. 
+                - When using C(gssapi), additional requirement (cyrus-sasl-gssapi) is needed and run C(kinit) before running Ansible to get a valid Kerberos ticket. 
              choices:
                 - simple
                 - gssapi

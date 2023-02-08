@@ -1,5 +1,10 @@
 # Ansible LDAP Inventory Plugin
 
+This fork is to modify this plugin to work easier with OpenLDAP.
+(Instead of Activedirectory as the original plugin does. Look there if you use an AD.)
+(This version is seraching for cn entries. Original plugin is searching for name entries.)
+
+=============================
 This plugin was designed to query active directory and get a list of machines to use as an inventory.
 Groups are auto generated off of OU structure and optionally group membership. 
 So for example `cn=computer1,ou=servers,ou=windows,dc=mycompany,dc=local` would create the following inventory :

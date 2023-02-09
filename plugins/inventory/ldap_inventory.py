@@ -473,7 +473,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             
             
             if self.group_membership:
-                groupFilter = "(&(objectClass=group)(memberUid:1.3.6.1.1.1.1.12:=%s)(cn=%s))" % (item[0], self.group_membership_filter)
+                groupFilter = "(&(objectClass=groupOfNames)(member=%s)(cn=%s))" % (item[0], self.group_membership_filter)
                 try:
                     ldapSearch = self.ldap_session.search_ext_s(base=root_ou, scope=ldap_search_scope, filterstr=groupFilter, attrlist=["cn"])
                 except ldap.LDAPError as err:

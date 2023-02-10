@@ -140,6 +140,39 @@ extra_groups:
   - baz
 ```
 
+### `group_objectclass`
+>objectClass of groups within LDAP, for example, when you have another objectClass for groups
+* default: `"groupOfNames"`
+
+**example:**
+```yaml
+group_objectclass: "posixGroup"
+```
+
+### `group_member_node`
+>node type to use for hostname membership in groups, for example, when you have another node type in groups
+* default: `"member"`
+
+**example:**
+```yaml
+group_member_node: "member"
+```
+### `group_objectclass`
+>objectClass of groups within LDAP, for example, when you have another objectClass for groups
+* default: `"groupOfNames"`
+
+**example:**
+```yaml
+group_objectclass: "posixGroup"
+```
+### `hostname_node`
+>node type to use for hostname search
+* default: `"cn"`
+
+**example:**
+```yaml
+hostname_node: "cn"
+```
 ### `fqdn_format`
 >Specifies if we should use FQDN instead of shortname for hosts.
 * Allow Values: `True`, `False`

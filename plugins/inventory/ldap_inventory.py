@@ -147,6 +147,30 @@ DOCUMENTATION = '''
              default: []
              required: False
              type: list
+         group_objectclass:
+             description:
+                - objectClass of groups within LDAP
+                - For example, when you have another objectClass for groups
+                - "  group_objectclass: posixGroup"
+             required: False
+             default: "groupOfNames"
+             type: str
+         group_member_node:
+             description:
+                - node type to use for hostname membership in groups 
+                - For example, when you have another node type in groups
+                - "  group_member_node: uid"
+             required: False
+             default: "member"
+             type: str
+         hostname_node:
+             description:
+                - node type to use for hostnames 
+                - For example, when you have another node type in use for computers/devices entries
+                - "  hostname_node: uid"
+             required: False
+             default: "cn"
+             type: str
 '''
 
 EXAMPLES = '''
@@ -180,7 +204,7 @@ except ImportError:
     HAS_LDAP = False
     LDAP_IMP_ERR = traceback.format_exc()
 
-hostname_field = "cn"
+#hostname_field = "cn"
 
 display = Display()
 
@@ -296,6 +320,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self.ldap_filter = self.get_option('ldap_filter')
         self.group_membership_filter = self.get_option('group_membership_filter')
         self.extra_groups = self.get_option('extra_groups')
+        self.group_objectclass = self.get_option('group_objectclass')
+        self.group_member_node = self.get_option('group_member_node')
+        self.hostname_node = self.get_option('hostname_node')
 
 
     def _ldap_bind(self):
@@ -401,11 +428,29 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             raise AnsibleError("Search base not set in search_ou config option or SEARCH_OU environmental variable")
         
         ldap_search_scope = ldap.SCOPE_SUBTREE
+
         if not self.ldap_filter:
             ldap_type_groupFilter = '(objectClass=device)'
         else:
             ldap_type_groupFilter = self.ldap_filter  # Todo check if query is valid
-        
+
+        # global required for use in multiprocessing pool.map
+        global hostname_field
+        if not self.hostname_node:
+            hostname_field = "cn"
+        else:
+            hostname_field = self.hostname_node  # Todo check if query is valid
+
+        if not self.group_objectclass:
+            group_objectclass = 'groupOfNames'
+        else:
+            group_objectclass = self.group_objectclass  # Todo check if query is valid
+
+        if not self.group_member_node:
+            group_member = 'member'
+        else:
+            group_member = self.group_member_node  # Todo check if query is valid
+
         if self.account_age > 0:
             ldap_search_attributeFilter = [hostname_field,'lastLogontimeStamp']
         else:
@@ -443,6 +488,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 continue
             if self.online_only and item[2]['online'] is False :
                 continue
+            display.vvv("DEBUG: " + str(item[1]) + " " + str(item[0]))
             hostName = item[1][hostname_field][0].decode("utf-8").lower()
             display.vvv("DEBUG: " + hostName + " processing host")
             pattern = re.compile('^dc')
@@ -473,7 +519,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             
             
             if self.group_membership:
-                groupFilter = "(&(objectClass=groupOfNames)(member=%s)(cn=%s))" % (item[0], self.group_membership_filter)
+                groupFilter = "(&(objectClass=%s)(%s=%s)(cn=%s))" % (group_objectclass, group_member, item[0], self.group_membership_filter)
                 try:
                     ldapSearch = self.ldap_session.search_ext_s(base=root_ou, scope=ldap_search_scope, filterstr=groupFilter, attrlist=["cn"])
                 except ldap.LDAPError as err:
